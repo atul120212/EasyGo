@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripsAI: Plan Your Trip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide-react@latest/dist/lucide-react.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .bg-pattern {
+            background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23e2e8f0\" fill-opacity=\"0.4\"%3E%3Cpath d=\"M36 34.56L36 34.56 36 35.438 36 35.438 36 35.438 36 35.438zM0 0h6v6H0zM9 18h6v6H9zM18 36h6v6h-6zM27 9h6v6h-6zM36 27h6v6h-6zM45 45h6v6h-6z\"/%3E%3Cpath d=\"M18 45h6v6h-6zM27 18h6v6h-6zM36 0h6v6h-6zM45 27h6v6h-6zM54 9h6v6h-6zM54 36h6v6h-6zM9 9h6v6H9zM18 27h6v6h-6zM27 54h6v6h-6zM36 18h6v6h-6zM45 0h6v6h-6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+            background-size: 10px 10px;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen bg-white text-slate-800">
+
+    <div class="flex-grow flex items-center justify-center p-4 sm:p-6 bg-slate-50">
+        <div class="w-full max-w-xl mx-auto bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-slate-200">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 text-center mb-2">Plan Your Adventure</h1>
+            <p class="text-center text-slate-500 mb-8 sm:mb-10">Tell us about your next trip, and we'll handle the rest.
+            </p>
+
+            <form id="trip-details-form" class="space-y-6">
+
+                <div>
+                    <label for="Source" class="block text-sm font-semibold text-slate-700 mb-1">Source</label>
+                    <input type="text" id="Source" name="Source" placeholder="e.g., Goa, Kyoto, Paris" required
+                        class="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+                </div>
+                <div>
+                    <label for="destination" class="block text-sm font-semibold text-slate-700 mb-1">Destination</label>
+                    <input type="text" id="destination" name="destination" placeholder="e.g., Goa, Kyoto, Paris"
+                        required
+                        class="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="start-date" class="block text-sm font-semibold text-slate-700 mb-1">Start
+                            Date</label>
+                        <input type="date" id="start-date" name="start-date" required
+                            class="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+                    </div>
+                    <div>
+                        <label for="end-date" class="block text-sm font-semibold text-slate-700 mb-1">End Date</label>
+                        <input type="date" id="end-date" name="end-date" required
+                            class="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="travelers" class="block text-sm font-semibold text-slate-700 mb-1">Number of
+                        Travelers</label>
+                    <input type="number" id="travelers" name="travelers" value="1" min="1" required
+                        class="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+                </div>
+
+                <div class="space-y-4">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Interests</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="heritage" name="interests" value="heritage"
+                                class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 transition-all duration-200">
+                            <label for="heritage" class="text-slate-700">Heritage</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="nightlife" name="interests" value="nightlife"
+                                class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 transition-all duration-200">
+                            <label for="nightlife" class="text-slate-700">Nightlife</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="adventure" name="interests" value="adventure"
+                                class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 transition-all duration-200">
+                            <label for="adventure" class="text-slate-700">Adventure</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="culinary" name="interests" value="culinary"
+                                class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 transition-all duration-200">
+                            <label for="culinary" class="text-slate-700">Culinary</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="relaxation" name="interests" value="relaxation"
+                                class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 transition-all duration-200">
+                            <label for="relaxation" class="text-slate-700">Relaxation</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="nature" name="interests" value="nature"
+                                class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 transition-all duration-200">
+                            <label for="nature" class="text-slate-700">Nature</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label for="budget" class="block text-sm font-semibold text-slate-700 mb-1">Budget per
+                        person</label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" id="budget-slider" name="budget" min="1000" max="50000" value="10000"
+                            step="500" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <span id="budget-value"
+                            class="text-lg font-bold text-indigo-600 whitespace-nowrap">₹10,000</span>
+                    </div>
+                </div>
+                <button onclick="window.location.href='payment.html'"
+                    class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 transition-transform transform hover:scale-105 shadow-lg">
+                    Generate My Itinerary
+                </button>
+
+            </form>
+
+            <!-- Loading Modal -->
+            <div id="loading-modal"
+                class="fixed inset-0 bg-slate-900 bg-opacity-70 flex items-center justify-center hidden">
+                <div class="bg-white p-8 rounded-2xl shadow-xl flex flex-col items-center">
+                    <div class="w-16 h-16 border-4 border-indigo-500 border-dashed rounded-full animate-spin"></div>
+                    <p class="mt-4 text-center text-slate-700 font-semibold">Generating your personalized trip...</p>
+                    <p class="text-sm text-slate-500 mt-2">This may take a moment. We're finding the perfect spots just
+                        for you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('trip-details-form');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const loadingModal = document.getElementById('loading-modal');
+        const budgetSlider = document.getElementById('budget-slider');
+        const budgetValue = document.getElementById('budget-value');
+        const backendUrl = 'http://127.0.0.1:8000/generate-itinerary'; // Ensure this matches your backend's URL
+
+        // Set min date for date inputs
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.setAttribute('min', today);
+        endDateInput.setAttribute('min', today);
+
+        // Update budget value display
+        budgetSlider.addEventListener('input', (event) => {
+            const value = parseInt(event.target.value);
+            budgetValue.textContent = `₹${value.toLocaleString('en-IN')}`;
+        });
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        alert(`Your current location coordinates are: ${lat}, ${lon}`);
+                        // You can now use these coordinates to get a city name
+                        // or send them directly to the backend.
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
+                        alert("Could not get your location. Please ensure location services are enabled.");
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        // Form submission logic
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loadingModal.classList.remove('hidden');
+
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            const durationInDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+            const tripData = {
+                destination: document.getElementById('destination').value,
+                startDate: startDateInput.value,
+                endDate: endDateInput.value,
+                duration: durationInDays,
+                travelers: parseInt(document.getElementById('travelers').value),
+                interests: Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(cb => cb.value),
+                budget: parseInt(budgetSlider.value)
+            };
+
+            try {
+                const response = await fetch(backendUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tripData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const itinerary = await response.json();
+
+                // Save the itinerary to local storage before redirecting
+                localStorage.setItem('tripsAIItinerary', JSON.stringify(itinerary));
+
+                loadingModal.classList.add('hidden');
+                window.location.href = 'itinerary.html';
+
+            } catch (error) {
+                console.error("Failed to generate itinerary:", error);
+                loadingModal.classList.add('hidden');
+                alert("Sorry, we couldn't generate your itinerary. Please try again later.");
+            }
+        });
+    </script>
+</body>
+
+</html>
