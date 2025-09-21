@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripsAI: Booking Confirmed!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide-react@latest/dist/lucide-react.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen bg-white text-slate-800">
+
+    <div class="flex-grow flex items-center justify-center p-4 sm:p-6 bg-slate-50">
+        <div
+            class="w-full max-w-xl mx-auto bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-slate-200 text-center">
+            <div class="mb-6 flex justify-center">
+                <div class="bg-green-100 p-4 rounded-full inline-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-check-circle-2 text-green-600">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-2">Booking Confirmed!</h1>
+            <!-- <p class="text-slate-500 mb-6 sm:mb-8">Your trip to <span class="font-semibold text-slate-700">Goa</span>
+                has been successfully booked.</p> -->
+            <p id="confirmation-text" class="text-slate-500 mb-6 sm:mb-8">
+                Your trip from <span id="confirmSource" class="font-semibold text-slate-700">...</span>
+                to <span id="confirmDestination" class="font-semibold text-slate-700">...</span>
+                has been successfully booked.
+            </p>
+
+
+            <div class="bg-slate-50 rounded-2xl p-6 mb-6 text-left">
+                <h2 class="text-xl font-bold text-slate-800 mb-4">Itinerary Details</h2>
+                <ul class="space-y-3 text-slate-600">
+                    <li class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-map-pin text-indigo-500 flex-shrink-0">
+                            <path d="M12 18s-4-6-4-8a4 4 0 0 1 8 0c0 2-4 8-4 8z" />
+                            <circle cx="12" cy="10" r="2" />
+                        </svg>
+                        <span>Destination: <span class="font-semibold text-slate-700">Goa</span></span>
+                    </li>
+                    <li class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-calendar-days text-indigo-500 flex-shrink-0">
+                            <rect width="18" height="18" x="3" y="4" rx="2" />
+                            <line x1="16" x2="16" y1="2" y2="6" />
+                            <line x1="8" x2="8" y1="2" y2="6" />
+                            <line x1="3" x2="21" y1="10" y2="10" />
+                            <path d="M8 14h.01" />
+                            <path d="M12 14h.01" />
+                            <path d="M16 14h.01" />
+                            <path d="M8 18h.01" />
+                            <path d="M12 18h.01" />
+                            <path d="M16 18h.01" />
+                        </svg>
+                        <span>Dates: <span class="font-semibold text-slate-700">Dec 20, 2025 - Dec 24,
+                                2025</span></span>
+                    </li>
+                    <li class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-user-2 text-indigo-500 flex-shrink-0">
+                            <path d="M14 19a6 6 0 0 0-12 0" />
+                            <circle cx="8" cy="10" r="4" />
+                            <path d="M22 19a6 6 0 0 0-12 0" />
+                            <circle cx="16" cy="10" r="4" />
+                        </svg>
+                        <span>Travelers: <span class="font-semibold text-slate-700">2</span></span>
+                    </li>
+                </ul>
+            </div>
+
+            <a href="itinerary.html"
+                class="inline-block w-full sm:w-auto p-4 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors duration-200">
+                View Your Full Itinerary
+            </a>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const source = localStorage.getItem("tripsAISource") || "your city";
+            const destination = localStorage.getItem("tripsAIDestination") || "your destination";
+            const startDate = localStorage.getItem("tripsAIStartDate") || "";
+            const endDate = localStorage.getItem("tripsAIEndDate") || "";
+            const travelers = localStorage.getItem("tripsAITravelers") || "";
+
+            // ✅ Fill confirmation text
+            document.getElementById("confirmSource").textContent = source;
+            document.getElementById("confirmDestination").textContent = destination;
+
+            // ✅ Update itinerary details section (if you want to show more info)
+            const detailsList = document.querySelector("ul.space-y-3");
+            if (detailsList) {
+                detailsList.innerHTML = `
+                <li class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" class="lucide lucide-map-pin text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 18s-4-6-4-8a4 4 0 0 1 8 0c0 2-4 8-4 8z" />
+                        <circle cx="12" cy="10" r="2" />
+                    </svg>
+                    <span>Route: <span class="font-semibold text-slate-700">${source} → ${destination}</span></span>
+                </li>
+                <li class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" class="lucide lucide-calendar-days text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="4" rx="2" />
+                        <line x1="16" x2="16" y1="2" y2="6" />
+                        <line x1="8" x2="8" y1="2" y2="6" />
+                        <line x1="3" x2="21" y1="10" y2="10" />
+                    </svg>
+                    <span>Dates: <span class="font-semibold text-slate-700">${startDate} → ${endDate}</span></span>
+                </li>
+                <li class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" class="lucide lucide-user-2 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 19a6 6 0 0 0-12 0" />
+                        <circle cx="8" cy="10" r="4" />
+                        <path d="M22 19a6 6 0 0 0-12 0" />
+                        <circle cx="16" cy="10" r="4" />
+                    </svg>
+                    <span>Travelers: <span class="font-semibold text-slate-700">${travelers}</span></span>
+                </li>
+            `;
+            }
+        });
+    </script>
+
+</body>
+
+</html>

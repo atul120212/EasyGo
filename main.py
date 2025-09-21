@@ -2,32 +2,29 @@ import time
 import os
 import json
 import google.generativeai as genai
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ValidationError
-from typing import List
+from typing import List, Optional
 from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
-# from serpapi import GoogleSearch
+import os, re, json, logging
 from serpapi import GoogleSearch
-from serpapi.google_search import GoogleSearch
 import random
+import requests
+from datetime import datetime
+
 # --- Environment Variable Setup ---
-# Load environment variables from a .env file for security
 load_dotenv()
 
 # --- Gemini API Configuration ---
-# Configure the generative AI model with the API key from environment variables
 try:
     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
     model = genai.GenerativeModel('gemini-1.5-flash')
 except KeyError:
-    # This provides a clear error if the API key is not set
     raise RuntimeError("GEMINI_API_KEY not found in environment variables. Please create a .env file and add it.")
 
-
 # --- Pydantic Models for Data Validation ---
-# These models ensure the data sent to and received from the API is structured correctly.
 class TripDetails(BaseModel):
     source: str
     destination: str
@@ -51,12 +48,38 @@ class DayPlan(BaseModel):
     summary: str
     activities: List[Activity]
 
-
 class Itinerary(BaseModel):
     title: str
     days: List[DayPlan]
     totalCost: int
-    image_url: str | None = None   # 👈 add this
+    image_url: str | None = None
+
+# --- NEW: Flight Models ---
+class FlightInfo(BaseModel):
+    airline: str
+    airplane: str
+    departure_time: str
+    arrival_time: str
+    departure_airport: str
+    arrival_airport: str
+    duration: str
+    price: str
+    travel_class: str = "Economy"
+
+class FlightResponse(BaseModel):
+    flights: List[FlightInfo]
+
+# --- NEW: Hotel Models ---
+class HotelInfo(BaseModel):
+    name: str
+    rating: Optional[str] = "4.0"
+    description: str
+    rate: str
+    amenities: Optional[List[str]] = []
+    location: Optional[str] = ""
+
+class HotelResponse(BaseModel):
+    hotels: List[HotelInfo]
 
 # --- FastAPI App Initialization ---
 app = FastAPI(
@@ -66,7 +89,6 @@ app = FastAPI(
 )
 
 # --- CORS Middleware ---
-# Allows the frontend to communicate with this backend.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -75,15 +97,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# Enable logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # --- AI Prompt Engineering Function ---
-# This function creates the detailed prompt for the Gemini AI model.
 def create_gemini_prompt(details: TripDetails) -> str:
     interests_str = ", ".join(details.interests)
     
-    # The JSON structure is explicitly defined in the prompt to ensure the AI returns a valid response.
-    # This is a key part of "prompt engineering".
     json_format_instructions = """
     {
       "title": "A string for the itinerary title",
@@ -133,108 +154,6 @@ def create_gemini_prompt(details: TripDetails) -> str:
     """
     return prompt
 
-
-# --- API Endpoint ---
-# @app.post("/api/generate-itinerary", response_model=Itinerary)
-# async def generate_itinerary_endpoint(details: TripDetails):
-#     """
-#     Accepts trip details, sends them to the Gemini model, and returns a personalized itinerary.
-#     """
-#     print("Received request with details:", details.model_dump_json(indent=2))
-    
-#     prompt = create_gemini_prompt(details)
-    
-#     try:
-#         # Send the prompt to the Gemini model
-#         response = model.generate_content(prompt)
-        
-#         # Clean up the response to ensure it's valid JSON
-#         # The AI can sometimes wrap the JSON in markdown backticks
-#         cleaned_response_text = response.text.strip().replace("```json", "").replace("```", "").strip()
-        
-#         print("--- Gemini Raw Response ---")
-#         print(cleaned_response_text)
-#         print("---------------------------")
-
-#         # Parse the JSON string from the AI's response
-#         itinerary_data = json.loads(cleaned_response_text)
-#         # ✅ Add image_url if not provided by AI
-#         if "image_url" not in itinerary_data or not itinerary_data["image_url"]:
-#             encoded_destination = details.destination.replace(" ", "+")
-#             itinerary_data["image_url"] = f"https://source.unsplash.com/1200x600/?{encoded_destination},travel"
-
-        
-#         # Validate the data against our Pydantic model
-#         # This ensures the AI's output matches our required structure.
-#         itinerary = Itinerary(**itinerary_data)
-#         return itinerary
-
-#     except (json.JSONDecodeError, ValidationError) as e:
-#         print(f"Error processing AI response: {e}")
-#         # If the AI response is not valid JSON or doesn't match our model, return an error.
-#         raise HTTPException(
-#             status_code=500, 
-#             detail="Failed to process the itinerary from the AI. The response was not in the expected format."
-#         )
-#     except Exception as e:
-#         print(f"An unexpected error occurred: {e}")
-#         # Catch any other potential errors (e.g., API connection issues)
-#         raise HTTPException(
-#             status_code=500, 
-#             detail=f"An unexpected error occurred while generating the itinerary: {str(e)}"
-#         )
-
-
-@app.get("/api/flights")
-async def search_flights(query: str):
-    """
-    Search for flights using SerpApi.
-    """
-    try:
-        if not os.environ.get("SERPAPI_KEY"):
-            raise ValueError("SERPAPI_KEY is not set in environment variables.")
-
-        params = {
-            "engine": "google_flights",
-            "q": query,
-            "api_key": os.environ.get("SERPAPI_KEY")
-        }
-
-        search = GoogleSearch(params)
-        results = search.get_dict()
-        
-        # You can process and simplify the results here if needed
-        return {"results": results.get("best_flights", [])}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to search flights: {str(e)}")
-
-@app.get("/api/hotels")
-async def search_hotels(query: str):
-    """
-    Search for hotels using SerpApi.
-    """
-    try:
-        if not os.environ.get("SERPAPI_KEY"):
-            raise ValueError("SERPAPI_KEY is not set in environment variables.")
-
-        params = {
-            "engine": "google_hotels",
-            "q": query,
-            "api_key": os.environ.get("SERPAPI_KEY")
-        }
-
-        search = GoogleSearch(params)
-        results = search.get_dict()
-
-        # You can process and simplify the results here if needed
-        return {"results": results.get("properties", [])}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to search hotels: {str(e)}")
-
-
-
 @app.post("/api/generate-itinerary", response_model=Itinerary)
 async def generate_itinerary_endpoint(details: TripDetails):
     print("Received request with details:", details.model_dump_json(indent=2))
@@ -246,66 +165,45 @@ async def generate_itinerary_endpoint(details: TripDetails):
         cleaned_response_text = response.text.strip().replace("```json", "").replace("```", "").strip()
         itinerary_data = json.loads(cleaned_response_text)
 
-        # ✅ Always add image_url if missing
+        # Add image_url if missing
         if "image_url" not in itinerary_data or not itinerary_data["image_url"]:
             try:
-                params = {
-                    "engine": "google_images",
-                    "q": details.destination,
-                    "api_key": os.environ.get("SERPAPI_KEY")  # 🔑 store in .env
-                }
-                search = GoogleSearch(params)
-                results = search.get_dict()
-                images_results = results.get("images_results", [])
-                # image_url = None  
+                if os.environ.get("SERPAPI_KEY"):
+                    params = {
+                        "engine": "google_images",
+                        "q": details.destination,
+                        "api_key": os.environ.get("SERPAPI_KEY")
+                    }
+                    search = GoogleSearch(params)
+                    results = search.get_dict()
+                    images_results = results.get("images_results", [])
 
-                # if images_results:
-                #     # Filter for results that contain an "original" field
-                #     high_res_images = [img for img in images_results if "original" in img]
+                    if images_results:
+                        valid_images = [
+                            img for img in images_results
+                            if "original" in img and "gstatic" not in img["original"]
+                        ]
 
-                #     if high_res_images:
-                #         # Pick the image with the largest resolution
-                #         best_image = max(
-                #             high_res_images,
-                #             key=lambda img: img.get("original_width", 0) * img.get("original_height", 0)
-                #         )
-                #         image_url = best_image["thumbnail"]
-                # if not image_url:
-                #     encoded_destination = details.destination.replace(" ", "+")
-                #     image_url = f"https://source.unsplash.com/1200x600/?{encoded_destination},travel"
-                # itinerary_data["image_url"] = image_url
-
-                # if images_results:
-                #     image_url = random.choice(images_results)["original"]
-                #     itinerary_data["image_url"] = image_url
-                if images_results:
-                    # ✅ Filter out Google "gstatic" links that block hotlinking
-                    valid_images = [
-                        img for img in images_results
-                        if "original" in img and "gstatic" not in img["original"]
-                    ]
-
-                    if valid_images:
-                        # Pick the largest resolution image
-                        best_image = max(
-                            valid_images,
-                            key=lambda img: img.get("original_width", 0) * img.get("original_height", 0)
-                        )
-                        image_url = best_image["original"]
+                        if valid_images:
+                            best_image = max(
+                                valid_images,
+                                key=lambda img: img.get("original_width", 0) * img.get("original_height", 0)
+                            )
+                            image_url = best_image["original"]
+                        else:
+                            encoded_destination = details.destination.replace(" ", "+")
+                            image_url = f"https://source.unsplash.com/1200x600/?{encoded_destination},travel"
                     else:
-                        # Fallback to Unsplash if no valid image found
                         encoded_destination = details.destination.replace(" ", "+")
                         image_url = f"https://source.unsplash.com/1200x600/?{encoded_destination},travel"
                 else:
-                    # No images at all → fallback to Unsplash
                     encoded_destination = details.destination.replace(" ", "+")
                     image_url = f"https://source.unsplash.com/1200x600/?{encoded_destination},travel"
 
                 itinerary_data["image_url"] = image_url
-
                 
             except Exception as e:
-                print(f"Failed to fetch Google image: {e}")
+                print(f"Failed to fetch image: {e}")
                 encoded_destination = details.destination.replace(" ", "+")
                 itinerary_data["image_url"] = f"https://source.unsplash.com/1200x600/?{encoded_destination},travel"
 
@@ -325,28 +223,154 @@ async def generate_itinerary_endpoint(details: TripDetails):
             detail=f"An unexpected error occurred while generating the itinerary: {str(e)}"
         )
 
+@app.get("/api/flights", response_model=FlightResponse)
+async def get_flights(
+    source_city: str = Query(..., description="Source city, e.g. Mumbai"),
+    destination_city: str = Query(..., description="Destination city, e.g. Goa"),
+    travel_date: str = Query(None, description="Travel date YYYY-MM-DD"),
+):
+    """
+    Generate flight data using Gemini API.
+    """
+    try:
+        logger.info(f"Received GET request for /api/flights with source_city='{source_city}', destination_city='{destination_city}', travel_date='{travel_date}'")
+        if not os.environ.get("GEMINI_API_KEY"):
+            raise HTTPException(status_code=500, detail="GEMINI_API_KEY not set")
+
+        model = genai.GenerativeModel("gemini-1.5-flash")
+
+        prompt = f"""
+        Generate a JSON list of exactly 3 realistic flight options from {source_city} to {destination_city}.
+        Travel date: {travel_date or "any upcoming date"}.
+
+        Each flight must have these EXACT fields:
+        - airline: string (e.g., "IndiGo", "Air India", "Vistara")
+        - airplane: string (e.g., "Airbus A320", "Boeing 737")
+        - departure_time: string in 12-hour format (e.g., "08:30 AM")
+        - arrival_time: string in 12-hour format (e.g., "10:45 AM")
+        - departure_airport: string with airport name and code (e.g., "Chhatrapati Shivaji International (BOM)")
+        - arrival_airport: string with airport name and code (e.g., "Goa International (GOI)")
+        - duration: string (e.g., "2h 15m")
+        - price: string in INR format (e.g., "₹4,500")
+        - travel_class: string (default "Economy")
+
+        Return ONLY valid JSON with this structure:
+        {{
+          "flights": [
+            {{ flight object }},
+            {{ flight object }},
+            {{ flight object }}
+          ]
+        }}
+
+        Do not add any text before or after the JSON.
+        """
+
+        response = model.generate_content(prompt)
+        text_output = response.text.strip()
+        logger.info(f"Raw Gemini flights output: {text_output[:500]}...")
+
+        # Extract JSON using regex
+        match = re.search(r"\{[\s\S]*\}", text_output)
+        if not match:
+            logger.error("Regex failed to find JSON object.")
+            raise HTTPException(status_code=500, detail="Gemini did not return valid JSON")
+
+        json_str = match.group(0)
+        logger.info(f"Extracted JSON string: {json_str[:500]}...")
+        json_str = re.sub(r",\s*([}\]])", r"\1", json_str)
+
+        try:
+            flights_data = json.loads(json_str)
+            logger.info("JSON successfully parsed into Python dictionary.")
+        except json.JSONDecodeError as e:
+            logger.error("JSON parsing error: %s", e)
+            raise HTTPException(status_code=500, detail=f"Failed to parse JSON: {e}")
+
+        # Validate the response
+        try:
+            validated_response = FlightResponse(**flights_data)
+            logger.info("Pydantic validation successful.")
+            return validated_response
+        except ValidationError as e:
+            logger.error("Pydantic validation failed: %s", e)
+            raise HTTPException(status_code=500, detail=f"Pydantic validation failed: {e}")
+
+    except Exception as e:
+        logger.error("Error generating flights: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to generate flights: {str(e)}")
 
 
-# @app.get("/background-image")
-# def get_background_image(query: str = "Coffee"):
-#     params = {
-#         "engine": "google_images_light",
-#         "q": query,
-#         "api_key": "myapi"  # ⚠️ replace with your real key
-#     }
-#     search = GoogleSearch(params)
-#     results = search.get_dict()
-#     images_results = results.get("images_results", [])
 
-#     if not images_results:
-#         return JSONResponse({"error": "No images found"}, status_code=404)
+@app.get("/api/hotels", response_model=HotelResponse)
+async def get_hotels(query: str = Query(..., description="Hotel search query, e.g. 'Goa hotels'")):
+    """
+    Generate hotel data using Gemini API.
+    """
+    try:
+        logger.info(f"Received GET request for /api/hotels with query='{query}'")
+        if not os.environ.get("GEMINI_API_KEY"):
+            raise HTTPException(status_code=500, detail="GEMINI_API_KEY not set")
 
-#     # Pick a random image for variety
-#     image_url = random.choice(images_results)["thumbnail"]
+        model = genai.GenerativeModel("gemini-1.5-flash")
 
-#     return {"image_url": image_url}
+        prompt = f"""
+        Generate a JSON list of exactly 3 realistic hotel options for the query: "{query}".
+
+        Each hotel must have these EXACT fields:
+        - name: string (realistic hotel name)
+        - rating: string (e.g., "4.2", "4.5")
+        - description: string (brief description of the hotel)
+        - rate: string in INR format (e.g., "₹3,500")
+        - amenities: list of strings (e.g., ["WiFi", "Pool", "Spa"])
+        - location: string (area/location description)
+
+        Return ONLY valid JSON with this structure:
+        {{
+          "hotels": [
+            {{ hotel object }},
+            {{ hotel object }},
+            {{ hotel object }}
+          ]
+        }}
+
+        Do not add any text before or after the JSON.
+        """
+
+        response = model.generate_content(prompt)
+        text_output = response.text.strip()
+        logger.info(f"Raw Gemini hotels output: {text_output[:500]}...")
+
+        # Extract JSON using regex
+        match = re.search(r"\{[\s\S]*\}", text_output)
+        if not match:
+            logger.error("Regex failed to find JSON object.")
+            raise HTTPException(status_code=500, detail="Gemini did not return valid JSON")
+
+        json_str = match.group(0)
+        logger.info(f"Extracted JSON string: {json_str[:500]}...")
+        json_str = re.sub(r",\s*([}\]])", r"\1", json_str)
+
+        try:
+            hotels_data = json.loads(json_str)
+            logger.info("JSON successfully parsed into Python dictionary.")
+        except json.JSONDecodeError as e:
+            logger.error("JSON parsing error: %s", e)
+            raise HTTPException(status_code=500, detail=f"Failed to parse JSON: {e}")
+
+        # Validate the response
+        try:
+            validated_response = HotelResponse(**hotels_data)
+            logger.info("Pydantic validation successful.")
+            return validated_response
+        except ValidationError as e:
+            logger.error("Pydantic validation failed: %s", e)
+            raise HTTPException(status_code=500, detail=f"Pydantic validation failed: {e}")
+
+    except Exception as e:
+        logger.error("Error generating hotels: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to generate hotels: {str(e)}")
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the TripsAI API. Visit /docs for documentation."}
-
