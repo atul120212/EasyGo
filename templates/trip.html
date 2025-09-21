@@ -186,7 +186,7 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         const backendUrl = "http://127.0.0.1:8000/api/generate-itinerary";
 
         const screens = ['screen-details', 'screen-interests', 'screen-budget'];
@@ -275,6 +275,8 @@
                 // Save the destination to local storage before redirecting
                 localStorage.setItem('tripsAIDestination', destination);
 
+
+
                 const response = await fetch(backendUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -286,9 +288,12 @@
                 }
 
                 const itinerary = await response.json();
-
-                // Save the itinerary to local storage before redirecting
                 localStorage.setItem('tripsAIItinerary', JSON.stringify(itinerary));
+                // ✅ Save totalCost separately for payment.html
+                localStorage.setItem('tripsAITotalCost', itinerary.totalCost);
+                console.log("Saved total cost:", itinerary.totalCost);
+
+
 
                 loadingModal.classList.remove('opacity-100');
                 loadingModal.classList.add('hidden');
@@ -321,7 +326,149 @@
             document.getElementById('end-date').setAttribute('min', today);
         });
 
+    </script> -->
+    <script>
+        const backendUrl = "http://127.0.0.1:8000/api/generate-itinerary";
+
+        const screens = ['screen-details', 'screen-interests', 'screen-budget'];
+        let currentScreenIndex = 0;
+
+        function goToScreen(screenId) {
+            screens.forEach(id => {
+                document.getElementById(id).classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        const interestOptions = [
+            { name: 'Sightseeing', icon: 'binoculars' },
+            { name: 'Foodie', icon: 'utensils' },
+            { name: 'Adventure', icon: 'mountain' },
+            { name: 'Relaxation', icon: 'sun' },
+            { name: 'History', icon: 'landmark' },
+            { name: 'Art & Culture', icon: 'palette' },
+            { name: 'Nightlife', icon: 'party-popper' },
+            { name: 'Shopping', icon: 'shopping-bag' },
+            { name: 'Nature', icon: 'leaf' },
+        ];
+
+        function renderInterestCards() {
+            const container = document.getElementById('interests-container');
+            container.innerHTML = interestOptions.map(option => `
+            <label class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-300 cursor-pointer transition-colors hover:bg-slate-100">
+                <input type="checkbox" name="interests" value="${option.name}" class="sr-only peer">
+                <div class="w-12 h-12 text-indigo-500 flex items-center justify-center bg-indigo-100 rounded-full mb-2 peer-checked:bg-indigo-600 peer-checked:text-white transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${option.icon}">
+                        <title>${option.name}</title>
+                    </svg>
+                </div>
+                <span class="text-sm font-medium text-slate-700 peer-checked:text-indigo-600">${option.name}</span>
+            </label>
+        `).join('');
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
+        function showErrorModal(message) {
+            const errorModal = document.getElementById('error-modal');
+            document.getElementById('error-message').textContent = message;
+            errorModal.classList.remove('hidden');
+        }
+
+        function hideErrorModal() {
+            const errorModal = document.getElementById('error-modal');
+            errorModal.classList.add('hidden');
+        }
+
+        // --- FORM SUBMIT ---
+        document.getElementById('trip-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const loadingModal = document.getElementById('loading-modal');
+            loadingModal.classList.remove('hidden');
+            loadingModal.classList.add('opacity-100');
+
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+            const start = new Date(startDateInput.value);
+            const end = new Date(endDateInput.value);
+            const durationInDays = (end - start) / (1000 * 60 * 60 * 24) + 1;
+
+            const budgetSlider = document.getElementById('budget-slider');
+            const destination = document.getElementById('destination').value;
+            const source = document.getElementById('source').value;
+
+            const tripData = {
+                destination: destination,
+                startDate: startDateInput.value,
+                endDate: endDateInput.value,
+                duration: durationInDays,
+                travelers: parseInt(document.getElementById('travelers').value),
+                interests: Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(cb => cb.value),
+                budget: parseInt(budgetSlider.value),
+                source: source
+            };
+
+            try {
+                // ✅ Save destination immediately (used in itinerary.html background)
+                localStorage.setItem('tripsAIDestination', destination);
+
+                const response = await fetch(backendUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tripData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const itinerary = await response.json();
+                console.log("Full itinerary response:", itinerary);
+
+                // ✅ Save whole itinerary
+                localStorage.setItem('tripsAIItinerary', JSON.stringify(itinerary));
+
+                // ✅ Save totalCost separately for payment.html
+                if (itinerary.totalCost) {
+                    localStorage.setItem('tripsAITotalCost', itinerary.totalCost);
+                    console.log("Saved total cost:", itinerary.totalCost);
+                } else {
+                    console.warn("⚠️ totalCost missing in itinerary response!");
+                }
+
+                loadingModal.classList.remove('opacity-100');
+                loadingModal.classList.add('hidden');
+
+                window.location.href = 'itinerary.html';
+
+            } catch (error) {
+                console.error("Failed to generate itinerary:", error);
+                loadingModal.classList.remove('opacity-100');
+                loadingModal.classList.add('hidden');
+                showErrorModal("Sorry, we couldn't generate your itinerary. Please try again later.");
+            }
+        });
+
+        // --- INITIAL SETUP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderInterestCards();
+
+            const budgetSlider = document.getElementById('budget-slider');
+            const budgetValue = document.getElementById('budget-value');
+            budgetSlider.addEventListener('input', (event) => {
+                const value = parseInt(event.target.value);
+                budgetValue.textContent = `₹${value.toLocaleString('en-IN')}`;
+            });
+
+            document.getElementById('close-modal-btn').addEventListener('click', hideErrorModal);
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('start-date').setAttribute('min', today);
+            document.getElementById('end-date').setAttribute('min', today);
+        });
     </script>
+
 </body>
 
 </html>

@@ -5,7 +5,7 @@ import requests
 
 
 params = {
-  "engine": "google_images_light",
+  "engine": "google_images",
   "q": "Coffee",
   "api_key": "9f7573a0965a1bf5ea63d3943aa0c81f972210c57e36afc0b60fca22d53ec3e2"
 }
@@ -23,7 +23,7 @@ images_results = results["images_results"]
 for idx, image in enumerate(images_results):
     print(f"Downloading image {idx + 1}: {image['title']}")
     # image_url = image.get("original")  # use original image URL
-    print(image['thumbnail'])
+    print(image)
     # if not image:
     #     continue
 

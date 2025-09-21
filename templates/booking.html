@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripsAI: Book Your Trip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide-react@latest/dist/lucide-react.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            /* slate-50 */
+        }
+
+        .booking-card {
+            background: linear-gradient(135deg, #ffffff, #f0f4f8);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen bg-slate-50 text-slate-800">
+
+    <main class="flex-grow p-4 sm:p-6 lg:p-10">
+        <div class="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
+
+            <div class="p-6 sm:p-8 bg-white border-b border-slate-200">
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-indigo-600 text-center">
+                    Book Your Trip to <span id="currentDestination">...</span>
+                </h1>
+                <p class="mt-2 text-md text-slate-500 text-center">
+                    Find the best flights and hotels for your personalized itinerary.
+                </p>
+            </div>
+
+            <div id="searchResults" class="p-6 sm:p-8 space-y-8 bg-slate-50">
+                <section class="booking-card rounded-2xl shadow-lg p-6 space-y-4">
+                    <h2 class="text-2xl font-bold text-slate-800">Flights</h2>
+                    <div id="flightsContainer" class="space-y-4">
+                        <p class="text-center text-slate-500">Searching for flights...</p>
+                    </div>
+                </section>
+
+                <section class="booking-card rounded-2xl shadow-lg p-6 space-y-4">
+                    <h2 class="text-2xl font-bold text-slate-800">Hotels</h2>
+                    <div id="hotelsContainer" class="space-y-4">
+                        <p class="text-center text-slate-500">Searching for hotels...</p>
+                    </div>
+                </section>
+            </div>
+
+            <div class="p-6 sm:p-8 bg-white border-t border-slate-200">
+                <a href="itinerary.html"
+                    class="block w-full text-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full shadow-md hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Back to Itinerary
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const destination = localStorage.getItem('tripsAIDestination');
+            const destinationElement = document.getElementById('currentDestination');
+
+            if (destination) {
+                destinationElement.textContent = destination;
+                searchFlights(destination);
+                searchHotels(destination);
+            } else {
+                destinationElement.textContent = 'a destination';
+                document.getElementById('searchResults').innerHTML = '<div class="text-center text-slate-500"><p>No destination found. Please return to the itinerary page to book your trip.</p></div>';
+            }
+        });
+
+        async function searchFlights(query) {
+            const resultsContainer = document.getElementById('flightsContainer');
+            try {
+                const response = await fetch(`/api/flights?query=${encodeURIComponent(`flights to ${query}`)}`);
+                const data = await response.json();
+                displayResults(data.results, 'flights', resultsContainer);
+            } catch (error) {
+                resultsContainer.innerHTML = '<p class="text-center text-red-500">Error fetching flights. Please try again later.</p>';
+                console.error('Fetch error:', error);
+            }
+        }
+
+        async function searchHotels(query) {
+            const resultsContainer = document.getElementById('hotelsContainer');
+            try {
+                const response = await fetch(`/api/hotels?query=${encodeURIComponent(`hotels in ${query}`)}`);
+                const data = await response.json();
+                displayResults(data.results, 'hotels', resultsContainer);
+            } catch (error) {
+                resultsContainer.innerHTML = '<p class="text-center text-red-500">Error fetching hotels. Please try again later.</p>';
+                console.error('Fetch error:', error);
+            }
+        }
+
+        function displayResults(items, type, container) {
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-500">No results found.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-start space-x-4 p-4 bg-slate-50 rounded-xl transition-shadow hover:shadow-md';
+
+                if (type === 'flights') {
+                    itemDiv.innerHTML = `
+                        <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane">
+                                <path d="M17.8 8.8L22 13 17.8 17.2 13 13 8.2 17.2 4 13 8.2 8.8 13 13z" transform="rotate(45 13 13)"/>
+                            </svg>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="text-lg font-semibold text-slate-800">${item.departure_airport?.name} to ${item.arrival_airport?.name}</h3>
+                            <p class="mt-1 text-sm text-slate-600">Airline: ${item.airline}</p>
+                            <p class="mt-1 text-md font-semibold text-indigo-600">${item.price}</p>
+                        </div>
+                    `;
+                } else if (type === 'hotels') {
+                    itemDiv.innerHTML = `
+                        <img src="${item.thumbnail}" alt="${item.name}" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg flex-shrink-0">
+                        <div class="flex-grow">
+                            <h3 class="text-lg font-semibold text-slate-800">${item.name}</h3>
+                            <p class="mt-1 text-sm text-slate-600">${item.address}</p>
+                            <p class="mt-1 text-sm font-semibold text-amber-500">Rating: ${item.rating || 'N/A'}</p>
+                            <p class="mt-1 text-md font-semibold text-indigo-600">${item.price}</p>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(itemDiv);
+            });
+            lucide.createIcons();
+        }
+    </script>
+</body>
+
+</html>

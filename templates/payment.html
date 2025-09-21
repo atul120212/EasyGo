@@ -32,8 +32,9 @@
     <div class="flex-grow flex items-center justify-center p-4 sm:p-6 bg-slate-50">
         <div class="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-slate-200">
             <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 text-center mb-2">Secure Payment</h1>
-            <p class="text-center text-slate-500 mb-8 sm:mb-10">Total Amount: <span id="total-amount"
-                    class="text-indigo-600 font-bold">₹25,000</span></p>
+
+            <p id="payment-total-cost" class="text-lg font-semibold text-indigo-600"></p>
+
 
             <div class="space-y-6">
                 <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-200 flex items-center justify-between">
@@ -68,11 +69,12 @@
                         </div>
                         <h2 class="text-lg font-semibold text-slate-800">UPI / QR Code</h2>
                     </div>
-                    <button onclick="window.location.href='confirm.html'"
+                    <button id="upi-payment-btn"
                         class="bg-slate-600 text-white font-bold py-2 px-6 rounded-full shadow-md hover:bg-slate-700 transition-colors duration-200">
                         Pay Now
                     </button>
                 </div>
+
             </div>
 
             <div class="mt-8 text-center text-slate-500 text-sm">
@@ -82,21 +84,20 @@
     </div>
 
     <script>
-        document.getElementById('card-payment-btn').addEventListener('click', () => {
-            simulatePayment();
-        });
+        document.addEventListener("DOMContentLoaded", () => {
+            const totalCost = localStorage.getItem('tripsAITotalCost');
+            console.log("Loaded total cost from localStorage:", totalCost); // debug
 
-        document.getElementById('upi-payment-btn').addEventListener('click', () => {
-            simulatePayment();
-        });
-
-        function simulatePayment() {
-            // In a real application, this would trigger the payment gateway flow
-            // For now, we simulate a successful payment and redirect
-            alert('Payment successful!');
-            window.location.href = 'confirmation.html';
-        }
+            if (totalCost) {
+                document.getElementById('payment-total-cost').textContent =
+                    `Total Trip Cost: ₹${Number(totalCost).toLocaleString('en-IN')}`;
+            } else {
+                document.getElementById('payment-total-cost').textContent =
+                    "⚠️ No cost found. Please go back and generate an itinerary.";
+            }
+        });    
     </script>
+
 </body>
 
 </html>
