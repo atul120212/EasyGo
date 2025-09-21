@@ -25,6 +25,7 @@ except KeyError:
 # --- Pydantic Models for Data Validation ---
 # These models ensure the data sent to and received from the API is structured correctly.
 class TripDetails(BaseModel):
+    source: str
     destination: str
     startDate: str
     endDate: str
@@ -102,6 +103,7 @@ def create_gemini_prompt(details: TripDetails) -> str:
     You are an expert travel planner for India. Your task is to create a personalized travel itinerary based on the user's preferences.
     
     **User Preferences:**
+    - source: {details.source}
     - Destination: {details.destination}
     - Duration: {details.duration} days
     - Number of Travelers: {details.travelers}
@@ -111,8 +113,12 @@ def create_gemini_prompt(details: TripDetails) -> str:
     **Your Task:**
     1.  Generate a creative, logical, and exciting day-by-day itinerary.
     2.  The `totalCost` should be a realistic estimate in INR for the specified number of travelers, considering the budget level.
-    3.  For each activity, provide a relevant placeholder image URL from `https://placehold.co/`. For example: `https://placehold.co/100x100/3498db/ffffff?text=Beach`.
-    4.  The final output MUST be a single, valid JSON object that strictly follows this structure. Do not include any text, explanations, or markdown formatting before or after the JSON object.
+    3.  For each `activity` in the `itinerary`, the `description` should be detailed. Include specific, realistic (but fictional) details like:
+        - **Famous food places:** Suggest a well-known local eatery and a famous dish to try.
+        - **Visiting hours:** Mention typical opening and closing times for attractions (e.g., "open from 9 AM to 5 PM").
+        - **Hotels and Flights:** Suggest realistic hotel names and approximate prices per night, and mention flight details (e.g., "A morning flight with IndiGo").
+    4.  For each activity, provide a relevant placeholder image URL from `https://placehold.co/`. For example: `https://placehold.co/100x100/3498db/ffffff?text=Beach`.
+    5.  The final output MUST be a single, valid JSON object that strictly follows this structure. Do not include any text, explanations, or markdown formatting before or after the JSON object.
 
     **Required JSON Structure:**
     {json_format_instructions}
