@@ -22,12 +22,16 @@
 
         body {
             font-family: "Inter", sans-serif;
-            background: linear-gradient(135deg, var(--dark-blue-900), var(--dark-blue-800), var(--sky-500));
+            background:
+                linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9), rgba(14, 165, 233, 0.8)),
+                url('your-image-url.jpg') no-repeat center top;
+            background-size: cover;
+            background-attachment: fixed;
+            /* stays in place while scrolling */
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
             color: #f1f5f9;
-            /* white-ish text for contrast */
         }
+
 
         /* Glass panels */
         .glass-panel {
@@ -127,10 +131,23 @@
 
             // ✅ UPDATED: Use backend-provided image_url if available, else fallback
             let imageUrl = itinerary.image_url;
-            if (!imageUrl) {
-                const encodedDestination = encodeURIComponent(destination);
-                imageUrl = `https://placehold.co/1200x600/6366f1/ffffff?text=${encodedDestination}`;
+            if (imageUrl) {
+                // Set hero section background
+                imageContainer.style.backgroundImage = `url('${imageUrl}')`;
+                imageContainer.style.backgroundSize = "cover";
+                imageContainer.style.backgroundPosition = "center";
+                imageContainer.style.backgroundRepeat = "no-repeat";
+
+                // ✅ Set full-page background as well
+                document.body.style.backgroundImage = `
+    linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9), rgba(14,165,233,0.75)), 
+    url('${imageUrl}')`;
+                document.body.style.backgroundSize = "cover";
+                document.body.style.backgroundAttachment = "fixed"; // keeps background in place while scrolling
+                document.body.style.backgroundPosition = "center top";
             }
+
+
 
             imageContainer.style.backgroundImage = `url('${imageUrl}')`;
             imageContainer.style.backgroundSize = 'cover';
