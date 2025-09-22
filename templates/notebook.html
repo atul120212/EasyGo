@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel Notebook</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Libraries for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      border-radius: 20px;
+      padding: 20px;
+      color: white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .container {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    button:disabled {
+      background: #888;
+      cursor: not-allowed;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 6px 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    .btn-group {
+      margin-top: 15px;
+    }
+    .btn-group button {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-4xl mx-auto">
+    <div class="card">
+      <h1 class="text-2xl font-light">Hi, Traveler!!</h1>
+      <h2 class="text-4xl font-bold">My Goa Tracker</h2>
+    </div>
+
+    <div class="container">
+      <h2>Expense Tracker</h2>
+      <form id="expenseForm">
+        <input type="text" id="expenseDesc" placeholder="Expense Description" required>
+        <input type="number" id="expenseAmount" placeholder="Amount" required>
+        <button type="submit">Add</button>
+      </form>
+
+      <h3>Total Spent: Rs <span id="total">0</span></h3>
+
+      <!-- List of expenses -->
+      <ul id="expenseList"></ul>
+
+      <div class="btn-group">
+        <button id="download-btn">Download PDF</button>
+        <button id="start-over-btn">Start Over</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

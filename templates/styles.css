@@ -1,0 +1,465 @@
+/* All styles from the previous response are included here. I've only added a few minor class names to make styling easier in plain CSS. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    padding: 1rem;
+}
+
+.max-w-4xl {
+    max-width: 56rem;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.card {
+    background-color: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.from-blue-500 {
+    --tw-gradient-from: #3b82f6;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(59, 130, 246, 0));
+}
+
+.to-purple-600 {
+    --tw-gradient-to: #9333ea;
+}
+
+.bg-black {
+    background-color: black;
+}
+
+.bg-opacity-20 {
+    opacity: 0.2;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.relative {
+    position: relative;
+}
+
+.z-10 {
+    z-index: 10;
+}
+
+.text-white {
+    color: white;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.font-light {
+    font-weight: 300;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+    margin-bottom: 2rem;
+}
+
+.p-8 {
+    padding: 2rem;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.space-x-6 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: 0;
+    margin-left: 1.5rem;
+}
+
+.space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1.5rem;
+}
+
+.w-6 {
+    width: 1.5rem;
+}
+
+.h-6 {
+    height: 1.5rem;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+.gap-6 {
+    gap: 1.5rem;
+}
+
+.gap-8 {
+    gap: 2rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.border {
+    border-width: 1px;
+}
+
+.border-purple-200 {
+    border-color: #e9d5ff;
+}
+
+.hover\:bg-purple-100:hover {
+    background-color: #f3e8ff;
+}
+
+.transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.grid {
+    display: grid;
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.md\:grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-gray-500 {
+    color: #6b7280;
+}
+
+.text-gray-800 {
+    color: #1f2937;
+}
+
+.rounded-2xl {
+    border-radius: 1rem;
+}
+
+.rounded-3xl {
+    border-radius: 1.5rem;
+}
+
+.day-sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    background-color: #581c87;
+    border-top-left-radius: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+}
+
+.day-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    top: 1.5rem;
+    writing-mode: vertical-rl;
+    color: white;
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+
+.day-image {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 5rem;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 9999px;
+    overflow: hidden;
+    border: 4px solid white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day-image-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.pt-10 {
+    padding-top: 2.5rem;
+}
+
+@media (min-width: 768px) {
+    .md\:pt-6 {
+        padding-top: 1.5rem;
+    }
+}
+
+.text-purple-700 {
+    color: #6d28d9;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.space-x-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: 0;
+    margin-left: 1rem;
+}
+
+.timeline-dot-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeline-dot {
+    width: 1rem;
+    height: 1rem;
+    background-color: #3b82f6;
+    border-radius: 9999px;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.timeline-line {
+    width: 0.125rem;
+    height: 4rem;
+    background-color: #e5e7eb;
+    margin-top: 0.5rem;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.list-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: #9ca3af;
+    border-radius: 9999px;
+    margin-right: 0.75rem;
+}
+
+.list-dot-small {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: #d1d5db;
+    border-radius: 9999px;
+    margin-right: 0.75rem;
+}
+
+.border-b {
+    border-bottom-width: 1px;
+}
+
+.border-dashed {
+    border-style: dashed;
+}
+
+.pb-4 {
+    padding-bottom: 1rem;
+}
+
+.text-green-600 {
+    color: #16a34a;
+}
+
+.bg-[#E9D8FD] {
+    background-color: #E9D8FD;
+}
+
+.text-[#6C3FC5] {
+    color: #6C3FC5;
+}
+
+.w-1\/3 {
+    width: 33.333333%;
+}
+
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.bg-[#F7F5FB] {
+    background-color: #F7F5FB;
+}
+
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.text-purple-600 {
+    color: #9333ea;
+}
+
+.border-purple-400 {
+    border-color: #c084fc;
+}
+
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+
+.text-black {
+    color: #000;
+}
+
+.tracking-widest {
+    letter-spacing: 0.1em;
+}
+
+.rounded-full {
+    border-radius: 9999px;
+}
+
+.bg-purple-700 {
+    background-color: #6d28d9;
+}
+
+.hover\:bg-purple-800:hover {
+    background-color: #5b21b6;
+}
+
+.py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.px-10 {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.bg-gradient-to-r.from-green-50.to-emerald-50 {
+    background-image: linear-gradient(to right, #f0fdf4, #ecfdf5);
+}
+
+.border-green-200 {
+    border-color: #bbf7d0;
+}
