@@ -82,18 +82,15 @@
 
     <main class="flex-grow p-4 sm:p-6 lg:p-10">
         <div class="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
-            <div id="itinerary-header-container" class="relative">
-                <!-- Image will be loaded dynamically here -->
-                <div class="w-full h-[65px] bg-slate-200 flex items-end justify-center">
-
-                </div>
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80">
-                </div>
-                <div class="absolute bottom-6 left-6 right-6 text-white text-shadow-lg">
-                    <h1 id="itinerary-title" class="text-4xl font-extrabold"></h1>
-                    <p id="itinerary-subtitle" class="mt-2 text-xl font-semibold opacity-90"></p>
+            <div id="itinerary-header-container"
+                class="relative h-64 sm:h-80 md:h-96 bg-cover bg-center rounded-t-3xl overflow-hidden">
+                <div class="absolute inset-0 bg-black/50"></div> <!-- Dark overlay -->
+                <div class="absolute bottom-6 left-6 right-6 z-10">
+                    <h1 id="itinerary-title" class="text-4xl font-extrabold text-white drop-shadow-lg"></h1>
+                    <p id="itinerary-subtitle" class="mt-2 text-xl font-semibold text-slate-200"></p>
                 </div>
             </div>
+
 
             <div id="itinerary-content" class="p-6 sm:p-8 space-y-8">
                 <!-- Itinerary content will be dynamically loaded here -->
@@ -139,9 +136,6 @@
             imageContainer.style.backgroundSize = 'cover';
             imageContainer.style.backgroundPosition = 'center';
             imageContainer.style.backgroundRepeat = 'no-repeat';
-            imageContainer.style.color = 'transparent';
-            imageContainer.innerHTML = `
-    <img src="${imageUrl}" alt="Background for ${destination}" class="w-full h-64 object-cover" />` + imageContainer.innerHTML;
 
 
             const contentContainer = document.getElementById('itinerary-content');
@@ -155,7 +149,7 @@
                         </div>
                         <h2 class="text-2xl font-bold">${day.title}</h2>
                     </div>
-                    <p class="text-slate-600 leading-relaxed">${day.summary}</p>
+                    <p class="text-slate-200 leading-relaxed">${day.summary}</p>
                     <div class="activities-grid mt-4 space-y-4">
                         ${day.activities.map(activity => `
                             <div class="activity-item flex items-start space-x-4 p-4 glass-card rounded-xl transition-shadow hover:shadow-md">
@@ -166,8 +160,8 @@
                                     </svg>
                                 </div>
                                 <div class="flex-grow">
-                                    <h4 class="text-lg font-semibold text-slate-800">${activity.title} <span class="text-sm font-medium text-slate-500 ml-2">(${activity.time})</span></h4>
-                                    <p class="mt-1 text-sm text-slate-600">${activity.description}</p>
+                                    <h4 class="text-lg font-semibold text-slate-800">${activity.title} <span class="text-sm font-medium text-slate-100 ml-2">(${activity.time})</span></h4>
+                                    <p class="mt-1 text-sm text-slate-200">${activity.description}</p>
                                 </div>
                             </div>
                         `).join('')}
@@ -177,7 +171,7 @@
             });
             lucide.createIcons();
         } else {
-            document.body.innerHTML = '<div class="flex-grow flex items-center justify-center p-4 text-center text-slate-500"><p>No itinerary data found. Please go back and plan a trip.</p></div>';
+            document.body.innerHTML = '<div class="flex-grow flex items-center justify-center p-4 text-center text-slate-100"><p>No itinerary data found. Please go back and plan a trip.</p></div>';
         }
 
 
