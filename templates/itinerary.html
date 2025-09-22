@@ -132,20 +132,19 @@
             // ✅ UPDATED: Use backend-provided image_url if available, else fallback
             let imageUrl = itinerary.image_url;
             if (imageUrl) {
-                // Set hero section background
+                // Hero header background
                 imageContainer.style.backgroundImage = `url('${imageUrl}')`;
                 imageContainer.style.backgroundSize = "cover";
                 imageContainer.style.backgroundPosition = "center";
                 imageContainer.style.backgroundRepeat = "no-repeat";
 
-                // ✅ Set full-page background as well
-                document.body.style.backgroundImage = `
-    linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9), rgba(14,165,233,0.75)), 
-    url('${imageUrl}')`;
-                document.body.style.backgroundSize = "cover";
-                document.body.style.backgroundAttachment = "fixed"; // keeps background in place while scrolling
-                document.body.style.backgroundPosition = "center top";
+                // ✅ Full page background
+                document.body.style.background = `
+    linear-gradient(135deg, rgba(15,23,42,0.85), rgba(30,41,59,0.85), rgba(14,165,233,0.75)),
+    url('${imageUrl}') no-repeat center center fixed`;
+                document.body.style.backgroundSize = "cover"; // makes the image fit
             }
+
 
 
 
