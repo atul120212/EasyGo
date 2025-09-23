@@ -1,4 +1,1 @@
-[![Watch the video](https://img.youtube.com/vi/MLjy0dxocfc?si=ktn1hGuRmO01DbW1/hqdefault.jpg)](https://www.youtube.com/embed/MLjy0dxocfc?si=ktn1hGuRmO01DbW1)
-
-[<img src="https://img.youtube.com/vi/MLjy0dxocfc?si=ktn1hGuRmO01DbW1/hqdefault.jpg" width="600" height="300"
-/>](https://www.youtube.com/embed/MLjy0dxocfc?si=ktn1hGuRmO01DbW1)
+[![Watch the video](https://img.youtube.com/vi/_5tFXJQIzi4/0.jpg)]([https://www.youtube.com/watch?v=_5tFXJQIzi4](https://youtu.be/MLjy0dxocfc?si=iui4nFUu5yMvumYb))
